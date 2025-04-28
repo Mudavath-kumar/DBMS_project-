@@ -1,35 +1,23 @@
 "use server"
 
 import "server-only"
-import { compare, hash } from "bcryptjs"
-import { sign, verify } from "jsonwebtoken"
 import { cookies } from "next/headers"
-import * as db from "./mongodb-isolation"
+import * as serverDb from "./server-db"
 
 export async function hashPassword(password: string) {
-  return await hash(password, 12)
+  return await serverDb.hashPassword(password)
 }
 
 export async function verifyPassword(password: string, hashedPassword: string) {
-  return await compare(password, hashedPassword)
+  return await serverDb.verifyPassword(password, hashedPassword)
 }
 
 export async function createToken(user: { id: string; email: string; role: string }) {
-  const token = sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "7d" })
-
-  return token
+  return await serverDb.createToken(user)
 }
 
 export async function verifyToken(token: string) {
-  try {
-    return verify(token, process.env.JWT_SECRET!) as {
-      id: string
-      email: string
-      role: string
-    }
-  } catch (error) {
-    return null
-  }
+  return await serverDb.verifyToken(token)
 }
 
 export async function getSession() {
@@ -55,7 +43,7 @@ export async function getCurrentUser() {
     return null
   }
 
-  const user = await db.findOne("users", { _id: db.createObjectId(session.id) })
+  const user = await serverDb.getUserById(session.id)
 
   if (!user) {
     return null

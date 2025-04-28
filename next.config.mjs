@@ -10,9 +10,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Use a custom webpack configuration to completely exclude server-only modules
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Don't attempt to import these packages on the client side at all
+      // Replace all server-only modules with empty objects
       config.resolve.alias = {
         ...config.resolve.alias,
         // MongoDB and related packages
@@ -69,50 +70,8 @@ const nextConfig = {
         'node:wasi': false,
         'node:diagnostics_channel': false,
       };
-      
-      // Explicitly mark node modules as empty modules
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        util: false,
-        crypto: false,
-        process: false,
-        buffer: false,
-        stream: false,
-        zlib: false,
-        os: false,
-        tty: false,
-        child_process: false,
-        http: false,
-        https: false,
-        url: false,
-        net: false,
-        dns: false,
-        tls: false,
-        dgram: false,
-        readline: false,
-        events: false,
-        assert: false,
-        querystring: false,
-        string_decoder: false,
-        timers: false,
-        vm: false,
-        worker_threads: false,
-        module: false,
-        perf_hooks: false,
-        async_hooks: false,
-        inspector: false,
-        trace_events: false,
-        domain: false,
-        punycode: false,
-        repl: false,
-        cluster: false,
-        v8: false,
-        wasi: false,
-        diagnostics_channel: false,
-      };
     }
+    
     return config;
   },
   // Ensure server-only modules aren't bundled for the client
