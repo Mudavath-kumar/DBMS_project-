@@ -1,4 +1,4 @@
-import { getUserData, getUserAppointments } from "@/app/actions/data-fetching"
+import { getCurrentUser, getUserAppointments } from "@/app/actions/server-actions"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { format } from "date-fns"
 import DashboardCalendar from "./dashboard-calendar"
 
 export default async function DashboardPage() {
-  const user = await getUserData()
+  const user = await getCurrentUser()
 
   if (!user) {
     return (
@@ -27,12 +27,12 @@ export default async function DashboardPage() {
   const appointments = await getUserAppointments()
 
   const upcomingAppointments = appointments.filter(
-    (app: any) => new Date(app.date) >= new Date() && app.status !== "cancelled",
+    (app) => new Date(app.date) >= new Date() && app.status !== "cancelled",
   )
 
-  const pendingAppointments = appointments.filter((app: any) => app.status === "pending")
+  const pendingAppointments = appointments.filter((app) => app.status === "pending")
 
-  const completedAppointments = appointments.filter((app: any) => app.status === "completed")
+  const completedAppointments = appointments.filter((app) => app.status === "completed")
 
   return (
     <div className="container py-10">
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
 
             <TabsContent value="upcoming" className="space-y-4">
               {upcomingAppointments.length > 0 ? (
-                upcomingAppointments.map((appointment: any) => (
+                upcomingAppointments.map((appointment) => (
                   <Card key={appointment.id}>
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row gap-4">
@@ -177,11 +177,11 @@ export default async function DashboardPage() {
             </TabsContent>
 
             <TabsContent value="past" className="space-y-4">
-              {appointments.filter((app: any) => new Date(app.date) < new Date() || app.status === "cancelled").length >
+              {appointments.filter((app) => new Date(app.date) < new Date() || app.status === "cancelled").length >
               0 ? (
                 appointments
-                  .filter((app: any) => new Date(app.date) < new Date() || app.status === "cancelled")
-                  .map((appointment: any) => (
+                  .filter((app) => new Date(app.date) < new Date() || app.status === "cancelled")
+                  .map((appointment) => (
                     <Card key={appointment.id}>
                       <CardContent className="p-6">
                         <div className="flex flex-col md:flex-row gap-4">
@@ -249,7 +249,7 @@ export default async function DashboardPage() {
 
             <TabsContent value="all" className="space-y-4">
               {appointments.length > 0 ? (
-                appointments.map((appointment: any) => (
+                appointments.map((appointment) => (
                   <Card key={appointment.id}>
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row gap-4">

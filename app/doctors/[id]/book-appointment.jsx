@@ -11,18 +11,10 @@ import { AlertCircle, CalendarIcon, Clock, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { bookAppointment } from "@/app/actions/server-actions"
 
-interface BookAppointmentProps {
-  doctorId: string
-  availability: {
-    day: string
-    slots: string[]
-  }[]
-}
-
-export default function BookAppointment({ doctorId, availability }: BookAppointmentProps) {
+export default function BookAppointment({ doctorId, availability }) {
   const router = useRouter()
-  const [date, setDate] = useState<Date | undefined>(new Date())
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [date, setDate] = useState(new Date())
+  const [selectedTime, setSelectedTime] = useState(null)
   const [reason, setReason] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -56,7 +48,7 @@ export default function BookAppointment({ doctorId, availability }: BookAppointm
 
       // Redirect to appointments page
       router.push("/appointments?success=true")
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message || "An error occurred while booking the appointment")
     } finally {
       setIsLoading(false)

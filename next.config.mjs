@@ -12,11 +12,13 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Don't bundle server-only modules in client-side bundles
+      // Replace MongoDB and related modules with empty objects in client-side bundles
       config.resolve.alias = {
         ...config.resolve.alias,
         mongodb: false,
         '@napi-rs/snappy': false,
+        '@napi-rs/snappy-linux-x64-gnu': false,
+        '@napi-rs/snappy-linux-x64-musl': false,
         'mongodb-client-encryption': false,
         'aws4': false,
         'snappy': false,
@@ -25,7 +27,7 @@ const nextConfig = {
         'saslprep': false,
       };
       
-      // Explicitly mark these modules as empty modules
+      // Explicitly mark node modules as empty modules
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
@@ -53,6 +55,8 @@ const nextConfig = {
     serverComponentsExternalPackages: [
       'mongodb',
       '@napi-rs/snappy',
+      '@napi-rs/snappy-linux-x64-gnu',
+      '@napi-rs/snappy-linux-x64-musl',
       'mongodb-client-encryption',
       'aws4',
       'snappy',

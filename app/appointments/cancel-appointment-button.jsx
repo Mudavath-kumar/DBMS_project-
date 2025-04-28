@@ -4,9 +4,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
-import { cancelAppointment } from "../actions/server-actions"
+import { cancelAppointment } from "@/app/actions/server-actions"
 
-export default function CancelAppointmentButton({ appointmentId }: { appointmentId: string }) {
+export default function CancelAppointmentButton({ appointmentId }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 

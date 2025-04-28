@@ -1,17 +1,52 @@
 "use server"
 
-import "server-only"
-import { getCurrentUser } from "@/lib/auth"
-import { createAppointment, updateAppointment } from "@/lib/db-utils"
+import { cookies } from "next/headers"
+import { verify } from "jsonwebtoken"
+import * as dataAccess from "../../lib/data-access"
 import { revalidatePath } from "next/cache"
 
+// Authentication
+export async function getCurrentUser() {
+  const cookieStore = cookies()
+  const token = cookieStore.get("token")?.value
+
+  if (!token) {
+    return null
+  }
+
+  try {
+    const decoded = verify(token, process.env.JWT_SECRET)
+    const user = await dataAccess.getUserById(decoded.id)
+    return user
+  } catch (error) {
+    console.error("Auth error:", error)
+    return null
+  }
+}
+
+// Doctor data
+export async function getDoctor(id) {
+  return await dataAccess.getDoctorById(id)
+}
+
+export async function getDoctors(filters = {}) {
+  return await dataAccess.getAllDoctors(filters)
+}
+
+// Appointment data
+export async function getUserAppointments() {
+  const user = await getCurrentUser()
+  if (!user) return []
+
+  return await dataAccess.getAppointmentsByUserId(user.id)
+}
+
+export async function getAppointment(id) {
+  return await dataAccess.getAppointmentById(id)
+}
+
 // Booking action
-export async function bookAppointment(formData: {
-  doctorId: string
-  date: string
-  time: string
-  reason: string
-}) {
+export async function bookAppointment(formData) {
   try {
     const user = await getCurrentUser()
 
@@ -19,8 +54,8 @@ export async function bookAppointment(formData: {
       return { success: false, error: "Not authenticated" }
     }
 
-    await createAppointment({
-      userId: user._id,
+    await dataAccess.createAppointment({
+      userId: user.id,
       doctorId: formData.doctorId,
       date: formData.date,
       time: formData.time,
@@ -40,9 +75,9 @@ export async function bookAppointment(formData: {
 }
 
 // Cancel action
-export async function cancelAppointment(appointmentId: string) {
+export async function cancelAppointment(appointmentId) {
   try {
-    const result = await updateAppointment(appointmentId, {
+    const result = await dataAccess.updateAppointment(appointmentId, {
       status: "cancelled",
     })
 

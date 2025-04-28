@@ -1,5 +1,4 @@
-import { getDoctor } from "@/app/actions/data-fetching"
-import { getUserData } from "@/app/actions/data-fetching"
+import { getDoctor, getCurrentUser } from "@/app/actions/server-actions"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -9,8 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import { Star, MapPin, Phone, Mail, ThumbsUp, BookOpen } from "lucide-react"
 import BookAppointment from "./book-appointment"
 
-export default async function DoctorDetailPage({ params }: { params: { id: string } }) {
-  const [doctor, user] = await Promise.all([getDoctor(params.id), getUserData()])
+export default async function DoctorDetailPage({ params }) {
+  const [doctor, user] = await Promise.all([getDoctor(params.id), getCurrentUser()])
 
   if (!doctor) {
     return (
@@ -148,11 +147,11 @@ export default async function DoctorDetailPage({ params }: { params: { id: strin
                       </div>
                       <p className="text-muted-foreground">
                         Dr. {doctor.name.split(" ")[1]} was very thorough and took the time to explain everything to me.
-                        {review === 1 && "She answered all my questions and made me feel at ease. Highly recommend!"}
+                        {review === 1 && " She answered all my questions and made me feel at ease. Highly recommend!"}
                         {review === 2 &&
-                          "I've been seeing Dr. Johnson for years and she has always provided excellent care."}
+                          " I've been seeing Dr. Johnson for years and she has always provided excellent care."}
                         {review === 3 &&
-                          "After my heart attack, Dr. Johnson helped me recover and develop a heart-healthy lifestyle."}
+                          " After my heart attack, Dr. Johnson helped me recover and develop a heart-healthy lifestyle."}
                       </p>
                     </div>
                   ))}
