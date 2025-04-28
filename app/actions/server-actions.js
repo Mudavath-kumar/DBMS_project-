@@ -2,8 +2,8 @@
 
 import { cookies } from "next/headers"
 import { verify } from "jsonwebtoken"
-import * as dataAccess from "../../lib/data-access"
 import { revalidatePath } from "next/cache"
+import * as dataAccess from "../../lib/data-access"
 
 // Authentication
 export async function getCurrentUser() {
@@ -25,12 +25,12 @@ export async function getCurrentUser() {
 }
 
 // Doctor data
-export async function getDoctor(id) {
-  return await dataAccess.getDoctorById(id)
-}
-
 export async function getDoctors(filters = {}) {
   return await dataAccess.getAllDoctors(filters)
+}
+
+export async function getDoctor(id) {
+  return await dataAccess.getDoctorById(id)
 }
 
 // Appointment data

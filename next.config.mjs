@@ -12,7 +12,7 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Replace MongoDB and related modules with empty objects in client-side bundles
+      // Don't attempt to import these packages on the client side at all
       config.resolve.alias = {
         ...config.resolve.alias,
         mongodb: false,
@@ -25,6 +25,8 @@ const nextConfig = {
         'kerberos': false,
         'bson': false,
         'saslprep': false,
+        'bcryptjs': false,
+        'jsonwebtoken': false,
       };
       
       // Explicitly mark node modules as empty modules
