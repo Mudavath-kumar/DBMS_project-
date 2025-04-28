@@ -1,262 +1,216 @@
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, ChefHat, Clock, Utensils } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { getNewlyAddedRecipes, getPopularRecipes } from "@/lib/recipes"
-import { getAllCategories } from "@/lib/categories"
-import { getAllCuisines } from "@/lib/cuisines"
-import { initializeCategories } from "@/lib/categories"
-import { initializeCuisines } from "@/lib/cuisines"
+import { Card, CardContent } from "@/components/ui/card"
+import { CalendarCheck, Clock, UserCheck, Shield, Award, Heart } from "lucide-react"
 
-export default async function Home() {
-  // Initialize default data if needed
-  await Promise.all([initializeCategories(), initializeCuisines()])
-
-  // Fetch data for the homepage
-  const [newRecipes, popularRecipes, categories, cuisines] = await Promise.all([
-    getNewlyAddedRecipes(6),
-    getPopularRecipes(6),
-    getAllCategories(),
-    getAllCuisines(),
-  ])
-
+export default function Home() {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="bg-brown-50 py-16 md:py-24">
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/placeholder.svg?height=1080&width=1920"
+            alt="Medical background"
+            fill
+            className="object-cover opacity-10"
+            priority
+          />
+        </div>
+        <div className="container relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                Your Health, <span className="text-primary">Our Priority</span>
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Book appointments with top healthcare professionals in your area. Fast, secure, and convenient.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button size="lg" asChild>
+                  <Link href="/doctors">Find a Doctor</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/services">Our Services</Link>
+                </Button>
+              </div>
+              <div className="flex items-center gap-6 pt-4">
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold">500+</span>
+                  <span className="text-muted-foreground">Doctors</span>
+                </div>
+                <div className="h-10 border-l"></div>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold">10k+</span>
+                  <span className="text-muted-foreground">Patients</span>
+                </div>
+                <div className="h-10 border-l"></div>
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold">20+</span>
+                  <span className="text-muted-foreground">Specialties</span>
+                </div>
+              </div>
+            </div>
+            <div className="relative h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
+              <Image
+                src="/placeholder.svg?height=1000&width=800"
+                alt="Doctor with patient"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-muted/50">
         <div className="container">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-serif font-bold tracking-tight text-brown-900 mb-6">
-              Discover Your
-              <br />
-              Next Favorite Recipe
-            </h1>
-            <p className="text-xl text-brown-600 mb-8">
-              Explore our curated collection of delicious recipes from around the world
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl font-bold mb-4">Why Choose HealthBook?</h2>
+            <p className="text-muted-foreground text-lg">
+              We provide a seamless healthcare experience with features designed to make your life easier.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild className="bg-brown-600 hover:bg-brown-700 text-white">
-                <Link href="/cuisines/indian">Browse Indian Recipes</Link>
-              </Button>
-              <Button asChild variant="outline" className="border-brown-200">
-                <Link href="/videos">Watch Cooking Videos</Link>
-              </Button>
-              <Button asChild className="bg-green-600 hover:bg-green-700 text-white">
-                <Link href="/recipes/new">
-                  <Utensils className="mr-2 h-4 w-4" />
-                  Add Your Recipe
-                </Link>
-              </Button>
-            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <CalendarCheck className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Easy Scheduling</h3>
+                  <p className="text-muted-foreground">
+                    Book appointments with just a few clicks, 24/7, from anywhere.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Save Time</h3>
+                  <p className="text-muted-foreground">
+                    No more waiting on hold or standing in line. Manage your appointments online.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <UserCheck className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Verified Doctors</h3>
+                  <p className="text-muted-foreground">
+                    All healthcare providers on our platform are verified and qualified.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Secure & Private</h3>
+                  <p className="text-muted-foreground">
+                    Your health information is protected with industry-leading security.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Award className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Top Specialists</h3>
+                  <p className="text-muted-foreground">
+                    Access to the best specialists across multiple medical fields.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Heart className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Patient-Centered</h3>
+                  <p className="text-muted-foreground">
+                    We prioritize your needs and preferences for a better healthcare experience.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Newly Added Recipes */}
-      <section className="py-12 bg-amber-50">
+      {/* Featured Doctors */}
+      <section className="py-20">
         <div className="container">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
             <div>
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brown-900">Newly Added Recipes</h2>
-              <p className="text-brown-600">Check out the latest culinary creations from our community</p>
+              <h2 className="text-3xl font-bold mb-2">Our Featured Doctors</h2>
+              <p className="text-muted-foreground">Meet some of our top healthcare professionals</p>
             </div>
-            <Link href="/explore/recent" className="text-brown-600 hover:text-brown-800 flex items-center">
-              View All <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+            <Button variant="outline" className="mt-4 md:mt-0" asChild>
+              <Link href="/doctors">View All Doctors</Link>
+            </Button>
           </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {newRecipes.map((recipe) => (
-              <Link key={recipe._id?.toString()} href={`/recipes/${recipe._id}`}>
-                <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border-amber-100 hover:border-orange-200 hover:-translate-y-1">
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={recipe.imageUrl || "/placeholder.svg?height=300&width=400"}
-                      alt={recipe.title}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge className="bg-white text-brown-700 hover:bg-white">
-                        {recipe.dietary.includes("vegetarian") ? "Vegetarian" : "Non-Vegetarian"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium text-lg mb-2 line-clamp-1">{recipe.title}</h3>
-                    <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{recipe.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                        {recipe.cuisine}
-                      </Badge>
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                        {recipe.category}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0 flex justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <Clock className="mr-1 h-4 w-4 text-brown-500" />
-                      {recipe.cookingTime} mins
-                    </div>
-                    <div className="flex items-center">
-                      <ChefHat className="mr-1 h-4 w-4 text-brown-500" />
-                      {recipe.difficulty}
-                    </div>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-12">
-        <div className="container">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-brown-900">Recipe Categories</h2>
-            <p className="text-brown-600">Find recipes by meal type</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-            {categories.map((category) => (
-              <Link key={category.slug} href={`/categories/${category.slug}`}>
-                <Card className="h-full overflow-hidden hover:shadow-md transition-all duration-300 text-center group">
-                  <div className="relative h-36 w-full">
-                    <Image
-                      src={category.imageUrl || "/placeholder.svg?height=200&width=300"}
-                      alt={category.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <h3 className="font-medium text-lg text-white">{category.name}</h3>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Recipes */}
-      <section className="py-12 bg-brown-50">
-        <div className="container">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-brown-900">Popular Recipes</h2>
-              <p className="text-brown-600">Our most loved recipes by the community</p>
-            </div>
-            <Link href="/explore/popular" className="text-brown-600 hover:text-brown-800 flex items-center">
-              View All <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {popularRecipes.map((recipe) => (
-              <Link key={recipe._id?.toString()} href={`/recipes/${recipe._id}`}>
-                <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 border-amber-100 hover:border-orange-200 hover:-translate-y-1">
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={recipe.imageUrl || "/placeholder.svg?height=300&width=400"}
-                      alt={recipe.title}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute top-2 right-2">
-                      <Badge className="bg-white text-brown-700 hover:bg-white">
-                        {recipe.dietary.includes("vegetarian") ? "Vegetarian" : "Non-Vegetarian"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium text-lg mb-2 line-clamp-1">{recipe.title}</h3>
-                    <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{recipe.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                        {recipe.cuisine}
-                      </Badge>
-                      <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                        {recipe.category}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0 flex justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <Clock className="mr-1 h-4 w-4 text-brown-500" />
-                      {recipe.cookingTime} mins
-                    </div>
-                    <div className="flex items-center">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <svg
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.round(recipe.averageRating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-                          }`}
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </CardFooter>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Cuisines */}
-      <section className="py-12">
-        <div className="container">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-serif font-bold text-brown-900">Explore Cuisines</h2>
-            <p className="text-brown-600">Discover recipes from around the world</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {cuisines.map((cuisine) => (
-              <Link key={cuisine.slug} href={`/cuisines/${cuisine.slug}`}>
-                <Card className="h-full overflow-hidden hover:shadow-md transition-all duration-300 text-center group">
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={cuisine.imageUrl || "/placeholder.svg?height=300&width=400"}
-                      alt={cuisine.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <h3 className="font-medium text-xl text-white">{cuisine.name}</h3>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((doctor) => (
+              <Card key={doctor} className="overflow-hidden">
+                <div className="aspect-square relative">
+                  <Image
+                    src={`/placeholder.svg?height=400&width=400&text=Doctor+${doctor}`}
+                    alt={`Doctor ${doctor}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg">Dr. Sarah Johnson</h3>
+                  <p className="text-primary text-sm mb-2">Cardiologist</p>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Specializing in cardiovascular health with over 10 years of experience.
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <Link href={`/doctors/${doctor}`}>View Profile</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-brown-600 to-brown-800 text-white">
+      <section className="py-20 bg-primary text-primary-foreground">
         <div className="container">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Share Your Culinary Creations</h2>
-            <p className="text-lg mb-8 text-brown-100">
-              Join our community of food enthusiasts and share your favorite recipes with the world.
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">Ready to prioritize your health?</h2>
+            <p className="text-xl opacity-90 mb-8">
+              Join thousands of patients who trust HealthBook for their healthcare needs.
             </p>
-            <Button asChild size="lg" className="bg-white text-brown-800 hover:bg-brown-100">
-              <Link href="/recipes/new">
-                <Utensils className="mr-2 h-5 w-5" />
-                Add Your Recipe
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/signup">Create an Account</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="bg-transparent" asChild>
+                <Link href="/doctors">Find a Doctor</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

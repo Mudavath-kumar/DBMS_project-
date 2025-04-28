@@ -1,161 +1,305 @@
-import Link from "next/link"
-import { User, Mail, Calendar, Edit } from "lucide-react"
+"use client"
 
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { requireAuth } from "@/lib/auth"
-import { getUserRecipes } from "@/lib/recipes"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 
-export default async function ProfilePage() {
-  const user = await requireAuth()
-  const recipes = await getUserRecipes(user._id?.toString() || "")
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
+export default function ProfilePage() {
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [profileForm, setProfileForm] = useState({
+    name: "",
+    email: "",
+  })
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  })
+  const [profileError, setProfileError] = useState("")
+  const [profileSuccess, setProfileSuccess] = useState("")
+  const [passwordError, setPasswordError] = useState("")
+  const [passwordSuccess, setPasswordSuccess] = useState("")
+  const [isProfileSubmitting, setIsProfileSubmitting] = useState(false)
+  const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false)
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch("/api/auth/me")
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data.user)
+          setProfileForm({
+            name: data.user.name,
+            email: data.user.email,
+          })
+        } else {
+          // Redirect to login if not authenticated
+          router.push("/login")
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error)
+        router.push("/login")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [router])
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setProfileForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setPasswordForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setProfileError("")
+    setProfileSuccess("")
+    setIsProfileSubmitting(true)
+
+    try {
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: profileForm.name,
+          email: profileForm.email,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile")
+      }
+
+      setProfileSuccess("Profile updated successfully")
+    } catch (err: any) {
+      setProfileError(err.message || "An error occurred")
+    } finally {
+      setIsProfileSubmitting(false)
+    }
+  }
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPasswordError("")
+    setPasswordSuccess("")
+
+    // Basic validation
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("Passwords do not match")
+      return
+    }
+
+    if (passwordForm.newPassword.length < 8) {
+      setPasswordError("Password must be at least 8 characters long")
+      return
+    }
+
+    setIsPasswordSubmitting(true)
+
+    try {
+      const response = await fetch("/api/profile/password", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update password")
+      }
+
+      setPasswordSuccess("Password updated successfully")
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      })
+    } catch (err: any) {
+      setPasswordError(err.message || "An error occurred")
+    } finally {
+      setIsPasswordSubmitting(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container py-10">
+        <Skeleton className="h-12 w-[250px] mb-6" />
+        <div className="max-w-3xl mx-auto">
+          <Skeleton className="h-10 w-[200px] mb-4" />
+          <Skeleton className="h-[400px] rounded-xl" />
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="container py-8">
-      <div className="grid gap-8 md:grid-cols-3">
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>Manage your account information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="h-20 w-20 rounded-full bg-brown-100 flex items-center justify-center">
-                  <User className="h-10 w-10 text-brown-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-medium">{user.name}</h2>
-                  <p className="text-muted-foreground">Member</p>
-                </div>
-              </div>
+    <div className="container py-10">
+      <h1 className="text-3xl font-bold mb-6">Profile Settings</h1>
 
-              <div className="space-y-3 pt-4">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>{user.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href="/profile/edit">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Profile
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
+      <div className="max-w-3xl mx-auto">
+        <Tabs defaultValue="profile">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile">Profile Information</TabsTrigger>
+            <TabsTrigger value="password">Password</TabsTrigger>
+          </TabsList>
 
-          <div className="grid grid-cols-2 gap-4 mt-6">
+          <TabsContent value="profile" className="mt-6">
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl">{recipes.length}</CardTitle>
-                <CardDescription>Recipes</CardDescription>
+              <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>Update your account information and email address</CardDescription>
               </CardHeader>
-              <CardFooter className="pt-2">
-                <Link href="/my-recipes" className="text-sm text-primary hover:underline">
-                  View all
-                </Link>
+              <CardContent>
+                {profileError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{profileError}</AlertDescription>
+                  </Alert>
+                )}
+                {profileSuccess && (
+                  <Alert className="mb-4 border-green-500 text-green-500">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <AlertDescription>{profileSuccess}</AlertDescription>
+                  </Alert>
+                )}
+                <form onSubmit={handleProfileSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input id="name" name="name" value={profileForm.name} onChange={handleProfileChange} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={profileForm.email}
+                      onChange={handleProfileChange}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={isProfileSubmitting}>
+                    {isProfileSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="password" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>Update your password to keep your account secure</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {passwordError && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{passwordError}</AlertDescription>
+                  </Alert>
+                )}
+                {passwordSuccess && (
+                  <Alert className="mb-4 border-green-500 text-green-500">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <AlertDescription>{passwordSuccess}</AlertDescription>
+                  </Alert>
+                )}
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Current Password</Label>
+                    <Input
+                      id="currentPassword"
+                      name="currentPassword"
+                      type="password"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">New Password</Label>
+                    <Input
+                      id="newPassword"
+                      name="newPassword"
+                      type="password"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={isPasswordSubmitting}>
+                    {isPasswordSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
+                      </>
+                    ) : (
+                      "Update Password"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+              <CardFooter className="text-sm text-muted-foreground">
+                Make sure your password is at least 8 characters and includes a mix of letters, numbers, and symbols for
+                better security.
               </CardFooter>
             </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-2xl">{user.favorites.length}</CardTitle>
-                <CardDescription>Favorites</CardDescription>
-              </CardHeader>
-              <CardFooter className="pt-2">
-                <Link href="/favorites" className="text-sm text-primary hover:underline">
-                  View all
-                </Link>
-              </CardFooter>
-            </Card>
-          </div>
-        </div>
-
-        <div className="md:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Settings</CardTitle>
-              <CardDescription>Manage your account preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="font-medium">Email Notifications</h3>
-                <p className="text-sm text-muted-foreground">
-                  Configure which emails you want to receive from RecipeHaven
-                </p>
-                <div className="grid gap-2 pt-2">
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="new-recipes" className="rounded border-gray-300" defaultChecked />
-                    <label htmlFor="new-recipes" className="text-sm">
-                      New recipes from chefs you follow
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="comments" className="rounded border-gray-300" defaultChecked />
-                    <label htmlFor="comments" className="text-sm">
-                      Comments on your recipes
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="ratings" className="rounded border-gray-300" defaultChecked />
-                    <label htmlFor="ratings" className="text-sm">
-                      Ratings on your recipes
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="newsletter" className="rounded border-gray-300" />
-                    <label htmlFor="newsletter" className="text-sm">
-                      Weekly newsletter and cooking tips
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-4">
-                <h3 className="font-medium">Privacy Settings</h3>
-                <p className="text-sm text-muted-foreground">Control your privacy preferences</p>
-                <div className="grid gap-2 pt-2">
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="public-profile" className="rounded border-gray-300" defaultChecked />
-                    <label htmlFor="public-profile" className="text-sm">
-                      Make my profile public
-                    </label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="show-favorites" className="rounded border-gray-300" defaultChecked />
-                    <label htmlFor="show-favorites" className="text-sm">
-                      Show my favorite recipes to others
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="bg-brown-600 hover:bg-brown-700">Save Preferences</Button>
-            </CardFooter>
-          </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Account Actions</CardTitle>
-              <CardDescription>Manage your account data</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <Button variant="outline">Download My Data</Button>
-                <Button variant="outline" className="text-red-600 hover:bg-red-50 hover:text-red-700">
-                  Delete Account
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )
