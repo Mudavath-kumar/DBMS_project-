@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CalendarIcon, Clock, Loader2 } from "lucide-react"
 import { format } from "date-fns"
-import { bookAppointment } from "@/app/actions/booking-actions"
+import { bookAppointment } from "@/app/actions/server-actions"
 
 interface BookAppointmentProps {
   doctorId: string

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
-import { cancelAppointment } from "../actions/appointment-actions"
+import { cancelAppointment } from "../actions/server-actions"
 
 export default function CancelAppointmentButton({ appointmentId }: { appointmentId: string }) {
   const router = useRouter()

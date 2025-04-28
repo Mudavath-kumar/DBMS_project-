@@ -8,7 +8,21 @@ import { Clock } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-export default function DashboardCalendar({ appointments }: { appointments: any[] }) {
+// Define a type for appointments that doesn't rely on MongoDB types
+interface AppointmentType {
+  id: string
+  date: string | Date
+  time: string
+  status: string
+  doctor?: {
+    id: string
+    name: string
+    specialty: string
+    imageUrl: string
+  }
+}
+
+export default function DashboardCalendar({ appointments }: { appointments: AppointmentType[] }) {
   const [date, setDate] = useState<Date | undefined>(new Date())
 
   // Get appointments for the selected date
