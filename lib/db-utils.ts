@@ -1,3 +1,5 @@
+"use server"
+
 import { ObjectId } from "mongodb"
 import clientPromise from "./mongodb"
 

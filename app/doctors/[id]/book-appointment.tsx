@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CalendarIcon, Clock, Loader2 } from "lucide-react"
 import { format } from "date-fns"
+import { bookAppointment } from "@/app/actions/booking-actions"
 
 interface BookAppointmentProps {
   doctorId: string
@@ -42,23 +43,15 @@ export default function BookAppointment({ doctorId, availability }: BookAppointm
     setIsLoading(true)
 
     try {
-      const response = await fetch("/api/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          doctorId,
-          date: date.toISOString(),
-          time: selectedTime,
-          reason,
-        }),
+      const result = await bookAppointment({
+        doctorId,
+        date: date.toISOString(),
+        time: selectedTime,
+        reason,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to book appointment")
+      if (!result.success) {
+        throw new Error(result.error || "Failed to book appointment")
       }
 
       // Redirect to appointments page
