@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { hashPassword } from "@/lib/auth"
-import { createUser, getUserByEmail } from "@/lib/db-utils"
+import * as dataFetcher from "@/lib/data-fetcher"
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // Check if user already exists
-    const existingUser = await getUserByEmail(email)
+    const existingUser = await dataFetcher.getUserByEmail(email)
     if (existingUser) {
       return NextResponse.json({ message: "User with this email already exists" }, { status: 409 })
     }
@@ -25,12 +25,23 @@ export async function POST(request: Request) {
     const hashedPassword = await hashPassword(password)
 
     // Create new user
-    const user = await createUser({
-      name,
-      email,
-      password: hashedPassword,
-      role: "user",
+    const user = await fetch("/api/db", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        operation: "createUser",
+        params: {
+          name,
+          email,
+          password: hashedPassword,
+          role: "user",
+        },
+      }),
     })
+      .then((res) => res.json())
+      .then((data) => data.data)
 
     return NextResponse.json(
       {

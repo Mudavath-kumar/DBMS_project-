@@ -1,23 +1,38 @@
 "use server"
 
-import "server-only"
 import { cookies } from "next/headers"
-import * as serverDb from "./server-db"
+import { SignJWT, jwtVerify } from "jose"
+import { compare, hash } from "bcryptjs"
+import * as dataFetcher from "@/lib/data-fetcher"
+
+// Create a secret key for JWT
+const secretKey = new TextEncoder().encode(process.env.JWT_SECRET || "fallback-secret-key-for-development")
 
 export async function hashPassword(password: string) {
-  return await serverDb.hashPassword(password)
+  return await hash(password, 12)
 }
 
 export async function verifyPassword(password: string, hashedPassword: string) {
-  return await serverDb.verifyPassword(password, hashedPassword)
+  return await compare(password, hashedPassword)
 }
 
 export async function createToken(user: { id: string; email: string; role: string }) {
-  return await serverDb.createToken(user)
+  const token = await new SignJWT({ id: user.id, email: user.email, role: user.role })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(secretKey)
+
+  return token
 }
 
 export async function verifyToken(token: string) {
-  return await serverDb.verifyToken(token)
+  try {
+    const { payload } = await jwtVerify(token, secretKey)
+    return payload as { id: string; email: string; role: string }
+  } catch (error) {
+    return null
+  }
 }
 
 export async function getSession() {
@@ -43,7 +58,7 @@ export async function getCurrentUser() {
     return null
   }
 
-  const user = await serverDb.getUserById(session.id)
+  const user = await dataFetcher.getUserById(session.id)
 
   if (!user) {
     return null

@@ -9,12 +9,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CalendarIcon, Clock, Loader2 } from "lucide-react"
 import { format } from "date-fns"
-import { bookAppointment } from "@/app/actions/server-actions"
+import * as dataFetcher from "@/lib/data-fetcher"
 
-export default function BookAppointment({ doctorId, availability }) {
+export default function BookAppointment({ doctorId, availability }: { doctorId: string; availability: any[] }) {
   const router = useRouter()
-  const [date, setDate] = useState(new Date())
-  const [selectedTime, setSelectedTime] = useState(null)
+  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [reason, setReason] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -35,20 +35,17 @@ export default function BookAppointment({ doctorId, availability }) {
     setIsLoading(true)
 
     try {
-      const result = await bookAppointment({
+      await dataFetcher.createAppointment({
         doctorId,
         date: date.toISOString(),
         time: selectedTime,
+        status: "pending",
         reason,
       })
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to book appointment")
-      }
-
       // Redirect to appointments page
       router.push("/appointments?success=true")
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || "An error occurred while booking the appointment")
     } finally {
       setIsLoading(false)

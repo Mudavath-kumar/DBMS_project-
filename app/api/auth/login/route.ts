@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verifyPassword, createToken } from "@/lib/auth"
-import { getUserByEmail } from "@/lib/db-utils"
+import * as dataFetcher from "@/lib/data-fetcher"
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     // Find user
-    const user = await getUserByEmail(email)
+    const user = await dataFetcher.getUserByEmail(email)
     if (!user) {
       return NextResponse.json({ message: "Invalid email or password" }, { status: 401 })
     }
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     // Create token
     const token = await createToken({
-      _id: user._id,
+      id: user.id,
       email: user.email,
       role: user.role,
     })
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       {
         message: "Login successful",
         user: {
-          id: user._id,
+          id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,

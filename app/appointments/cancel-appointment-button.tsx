@@ -4,9 +4,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
-import { cancelAppointment } from "@/app/actions/server-actions"
+import * as dataFetcher from "@/lib/data-fetcher"
 
-export default function CancelAppointmentButton({ appointmentId }) {
+export default function CancelAppointmentButton({ appointmentId }: { appointmentId: string }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -18,11 +18,9 @@ export default function CancelAppointmentButton({ appointmentId }) {
     setIsLoading(true)
 
     try {
-      const result = await cancelAppointment(appointmentId)
-
-      if (!result.success) {
-        throw new Error(result.error || "Failed to cancel appointment")
-      }
+      await dataFetcher.updateAppointment(appointmentId, {
+        status: "cancelled",
+      })
 
       router.refresh()
     } catch (error) {

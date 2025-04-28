@@ -68,7 +68,8 @@
     "mongodb": "latest",
     "bcryptjs": "latest",
     "server-only": "latest",
-    "jsonwebtoken": "latest"
+    "jsonwebtoken": "latest",
+    "jose": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
