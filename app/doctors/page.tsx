@@ -1,4 +1,4 @@
-import { getAllDoctors } from "@/lib/db-utils"
+import { getDoctors } from "@/app/actions/data-fetching"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -11,7 +11,7 @@ export default async function DoctorsPage({
 }: {
   searchParams: { specialty?: string; search?: string }
 }) {
-  const doctors = await getAllDoctors({
+  const doctors = await getDoctors({
     specialty: searchParams.specialty,
     search: searchParams.search,
   })

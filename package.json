@@ -67,6 +67,7 @@
     "@aws-sdk/credential-providers": "latest",
     "mongodb": "latest",
     "bcryptjs": "latest",
+    "server-only": "latest",
     "jsonwebtoken": "latest"
   },
   "devDependencies": {

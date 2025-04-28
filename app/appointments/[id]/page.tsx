@@ -1,5 +1,4 @@
-import { getCurrentUser } from "@/lib/auth"
-import { getAppointmentById } from "@/lib/db-utils"
+import { getUserData, getAppointment } from "@/app/actions/data-fetching"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,7 +9,7 @@ import { format } from "date-fns"
 import CancelAppointmentButton from "./cancel-button"
 
 export default async function AppointmentDetailPage({ params }: { params: { id: string } }) {
-  const user = await getCurrentUser()
+  const user = await getUserData()
 
   if (!user) {
     return (
@@ -24,7 +23,7 @@ export default async function AppointmentDetailPage({ params }: { params: { id: 
     )
   }
 
-  const appointment = await getAppointmentById(params.id)
+  const appointment = await getAppointment(params.id)
 
   if (!appointment) {
     return (
@@ -39,7 +38,7 @@ export default async function AppointmentDetailPage({ params }: { params: { id: 
   }
 
   // Check if appointment belongs to user
-  if (appointment.userId.toString() !== user._id && user.role !== "admin") {
+  if (appointment.userId !== user._id && user.role !== "admin") {
     return (
       <div className="container py-10 text-center">
         <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>

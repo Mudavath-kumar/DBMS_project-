@@ -1,5 +1,5 @@
-import { getDoctorById } from "@/lib/db-utils"
-import { getCurrentUser } from "@/lib/auth"
+import { getDoctor } from "@/app/actions/data-fetching"
+import { getUserData } from "@/app/actions/data-fetching"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -10,7 +10,7 @@ import { Star, MapPin, Phone, Mail, ThumbsUp, BookOpen } from "lucide-react"
 import BookAppointment from "./book-appointment"
 
 export default async function DoctorDetailPage({ params }: { params: { id: string } }) {
-  const [doctor, user] = await Promise.all([getDoctorById(params.id), getCurrentUser()])
+  const [doctor, user] = await Promise.all([getDoctor(params.id), getUserData()])
 
   if (!doctor) {
     return (

@@ -11,10 +11,10 @@ const nextConfig = {
     unoptimized: true,
   },
   webpack: (config, { isServer }) => {
-    // Only include MongoDB and related packages in server-side bundles
     if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
+      // Don't bundle server-only modules in client-side bundles
+      config.resolve.alias = {
+        ...config.resolve.alias,
         mongodb: false,
         '@napi-rs/snappy': false,
         'mongodb-client-encryption': false,
@@ -22,17 +22,20 @@ const nextConfig = {
         'snappy': false,
         'kerberos': false,
         'bson': false,
-        'mongodb-client-encryption': false,
-        'supports-color': false,
         'saslprep': false,
-        'fs': false,
-        'path': false,
-        'util': false,
-        'crypto': false,
-        'process': false,
-        'buffer': false,
-        'stream': false,
-        'zlib': false,
+      };
+      
+      // Explicitly mark these modules as empty modules
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        util: false,
+        crypto: false,
+        process: false,
+        buffer: false,
+        stream: false,
+        zlib: false,
         'node:process': false,
         'node:fs': false,
         'node:path': false,
@@ -55,8 +58,14 @@ const nextConfig = {
       'snappy',
       'kerberos',
       'bson',
-      'saslprep'
+      'saslprep',
+      'bcryptjs',
+      'jsonwebtoken',
     ],
+    // This will help prevent server-only modules from being bundled on the client
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
 };
 

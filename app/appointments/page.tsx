@@ -1,5 +1,4 @@
-import { getCurrentUser } from "@/lib/auth"
-import { getAppointmentsByUserId } from "@/lib/db-utils"
+import { getUserData, getUserAppointments } from "@/app/actions/data-fetching"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -16,7 +15,7 @@ export default async function AppointmentsPage({
 }: {
   searchParams: { success?: string }
 }) {
-  const user = await getCurrentUser()
+  const user = await getUserData()
 
   if (!user) {
     return (
@@ -30,7 +29,7 @@ export default async function AppointmentsPage({
     )
   }
 
-  const appointments = await getAppointmentsByUserId(user._id)
+  const appointments = await getUserAppointments()
 
   const upcomingAppointments = appointments.filter(
     (app: any) => new Date(app.date) >= new Date() && app.status !== "cancelled",

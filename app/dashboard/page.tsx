@@ -1,5 +1,4 @@
-import { getCurrentUser } from "@/lib/auth"
-import { getAppointmentsByUserId } from "@/lib/db-utils"
+import { getUserData, getUserAppointments } from "@/app/actions/data-fetching"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -11,7 +10,7 @@ import { format } from "date-fns"
 import DashboardCalendar from "./dashboard-calendar"
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser()
+  const user = await getUserData()
 
   if (!user) {
     return (
@@ -25,29 +24,15 @@ export default async function DashboardPage() {
     )
   }
 
-  const appointments = await getAppointmentsByUserId(user._id)
+  const appointments = await getUserAppointments()
 
-  // Convert MongoDB ObjectId to string to avoid serialization issues
-  const serializedAppointments = appointments.map((app) => ({
-    ...app,
-    id: app.id.toString(),
-    userId: app.userId.toString(),
-    doctorId: app.doctorId.toString(),
-    doctor: app.doctor
-      ? {
-          ...app.doctor,
-          id: app.doctor.id.toString(),
-        }
-      : null,
-  }))
-
-  const upcomingAppointments = serializedAppointments.filter(
+  const upcomingAppointments = appointments.filter(
     (app: any) => new Date(app.date) >= new Date() && app.status !== "cancelled",
   )
 
-  const pendingAppointments = serializedAppointments.filter((app: any) => app.status === "pending")
+  const pendingAppointments = appointments.filter((app: any) => app.status === "pending")
 
-  const completedAppointments = serializedAppointments.filter((app: any) => app.status === "completed")
+  const completedAppointments = appointments.filter((app: any) => app.status === "completed")
 
   return (
     <div className="container py-10">
@@ -192,10 +177,9 @@ export default async function DashboardPage() {
             </TabsContent>
 
             <TabsContent value="past" className="space-y-4">
-              {serializedAppointments.filter(
-                (app: any) => new Date(app.date) < new Date() || app.status === "cancelled",
-              ).length > 0 ? (
-                serializedAppointments
+              {appointments.filter((app: any) => new Date(app.date) < new Date() || app.status === "cancelled").length >
+              0 ? (
+                appointments
                   .filter((app: any) => new Date(app.date) < new Date() || app.status === "cancelled")
                   .map((appointment: any) => (
                     <Card key={appointment.id}>
@@ -264,8 +248,8 @@ export default async function DashboardPage() {
             </TabsContent>
 
             <TabsContent value="all" className="space-y-4">
-              {serializedAppointments.length > 0 ? (
-                serializedAppointments.map((appointment: any) => (
+              {appointments.length > 0 ? (
+                appointments.map((appointment: any) => (
                   <Card key={appointment.id}>
                     <CardContent className="p-6">
                       <div className="flex flex-col md:flex-row gap-4">
@@ -333,7 +317,7 @@ export default async function DashboardPage() {
               <CardDescription>View and manage your appointments</CardDescription>
             </CardHeader>
             <CardContent>
-              <DashboardCalendar appointments={serializedAppointments} />
+              <DashboardCalendar appointments={appointments} />
             </CardContent>
           </Card>
         </div>
