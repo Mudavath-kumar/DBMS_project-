@@ -112,13 +112,7 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  // Transpile server-only modules
-  transpilePackages: [
-    'mongodb',
-    '@napi-rs/snappy',
-    'bcryptjs',
-    'jsonwebtoken',
-  ],
+  // Removed the transpilePackages option as it conflicts with serverComponentsExternalPackages
 };
 
 export default nextConfig;
