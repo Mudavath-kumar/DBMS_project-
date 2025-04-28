@@ -4,8 +4,7 @@ import "server-only"
 import { compare, hash } from "bcryptjs"
 import { sign, verify } from "jsonwebtoken"
 import { cookies } from "next/headers"
-import { ObjectId } from "mongodb"
-import clientPromise from "./mongodb"
+import * as db from "./mongodb-isolation"
 
 export async function hashPassword(password: string) {
   return await hash(password, 12)
@@ -15,10 +14,8 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return await compare(password, hashedPassword)
 }
 
-export async function createToken(user: { _id: ObjectId; email: string; role: string }) {
-  const token = sign({ id: user._id.toString(), email: user.email, role: user.role }, process.env.JWT_SECRET!, {
-    expiresIn: "7d",
-  })
+export async function createToken(user: { id: string; email: string; role: string }) {
+  const token = sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "7d" })
 
   return token
 }
@@ -58,10 +55,7 @@ export async function getCurrentUser() {
     return null
   }
 
-  const client = await clientPromise
-  const db = client.db()
-
-  const user = await db.collection("users").findOne({ _id: new ObjectId(session.id) })
+  const user = await db.findOne("users", { _id: db.createObjectId(session.id) })
 
   if (!user) {
     return null
@@ -69,7 +63,6 @@ export async function getCurrentUser() {
 
   return {
     ...user,
-    _id: user._id.toString(),
     password: undefined,
   }
 }

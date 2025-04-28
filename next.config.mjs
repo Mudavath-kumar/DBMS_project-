@@ -15,7 +15,8 @@ const nextConfig = {
       // Don't attempt to import these packages on the client side at all
       config.resolve.alias = {
         ...config.resolve.alias,
-        mongodb: false,
+        // MongoDB and related packages
+        'mongodb': false,
         '@napi-rs/snappy': false,
         '@napi-rs/snappy-linux-x64-gnu': false,
         '@napi-rs/snappy-linux-x64-musl': false,
@@ -25,9 +26,10 @@ const nextConfig = {
         'kerberos': false,
         'bson': false,
         'saslprep': false,
+        // Auth packages
         'bcryptjs': false,
         'jsonwebtoken': false,
-        // Add more server-only modules here
+        // Node.js built-in modules
         'node:process': false,
         'node:fs': false,
         'node:path': false,
@@ -79,14 +81,36 @@ const nextConfig = {
         buffer: false,
         stream: false,
         zlib: false,
-        'node:process': false,
-        'node:fs': false,
-        'node:path': false,
-        'node:util': false,
-        'node:crypto': false,
-        'node:buffer': false,
-        'node:stream': false,
-        'node:zlib': false,
+        os: false,
+        tty: false,
+        child_process: false,
+        http: false,
+        https: false,
+        url: false,
+        net: false,
+        dns: false,
+        tls: false,
+        dgram: false,
+        readline: false,
+        events: false,
+        assert: false,
+        querystring: false,
+        string_decoder: false,
+        timers: false,
+        vm: false,
+        worker_threads: false,
+        module: false,
+        perf_hooks: false,
+        async_hooks: false,
+        inspector: false,
+        trace_events: false,
+        domain: false,
+        punycode: false,
+        repl: false,
+        cluster: false,
+        v8: false,
+        wasi: false,
+        diagnostics_channel: false,
       };
     }
     return config;
@@ -112,7 +136,6 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  // Removed the transpilePackages option as it conflicts with serverComponentsExternalPackages
 };
 
 export default nextConfig;
